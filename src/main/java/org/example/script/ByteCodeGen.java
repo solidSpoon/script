@@ -1,10 +1,12 @@
 package org.example.script;
 
+import org.example.script.antlr.PlayScriptBaseVisitor;
+import org.example.script.antlr.PlayScriptParser;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
-import org.example.script.PlayScriptParser.*;
+import org.example.script.antlr.PlayScriptParser.*;
 import java.util.HashMap;
 import java.util.Map;
 

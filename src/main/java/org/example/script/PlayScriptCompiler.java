@@ -3,6 +3,8 @@ package org.example.script;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
+import org.example.script.antlr.PlayScriptLexer;
+import org.example.script.antlr.PlayScriptParser;
 
 /**
  * 把词法分析、语法分析、语义分析和解释执行简单地封装在一起。

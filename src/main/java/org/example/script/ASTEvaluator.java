@@ -1,6 +1,9 @@
 package org.example.script;
 
-import org.example.script.PlayScriptParser.*;
+import org.example.script.antlr.PlayScriptParser;
+import org.example.script.antlr.PlayScriptParser.*;
+import org.example.script.antlr.PlayScriptBaseVisitor;
+
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;

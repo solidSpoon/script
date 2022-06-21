@@ -1,6 +1,7 @@
 package org.example.script;
 
-import org.example.script.PlayScriptParser.*;
+import org.example.script.antlr.PlayScriptBaseListener;
+import org.example.script.antlr.PlayScriptParser.*;
 /**
  * 第二遍扫描。把变量、类继承、函数声明的类型都解析出来。
  * 也就是所有用到typeTpe的地方。

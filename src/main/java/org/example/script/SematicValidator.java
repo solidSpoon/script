@@ -2,7 +2,9 @@ package org.example.script;
 
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
-import org.example.script.PlayScriptParser.*;
+import org.example.script.antlr.PlayScriptBaseListener;
+import org.example.script.antlr.PlayScriptParser;
+import org.example.script.antlr.PlayScriptParser.*;
 /**
  * 进行一些语义检查，包括：
  * 01.break 只能出现在循环语句中，或case语句中；

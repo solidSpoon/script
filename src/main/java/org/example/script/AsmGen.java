@@ -1,7 +1,9 @@
 package org.example.script;
 
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.example.script.PlayScriptParser.*;
+import org.example.script.antlr.PlayScriptBaseVisitor;
+import org.example.script.antlr.PlayScriptParser;
+import org.example.script.antlr.PlayScriptParser.*;
 
 import java.util.HashMap;
 import java.util.LinkedList;

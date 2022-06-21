@@ -1,7 +1,9 @@
 package org.example.script;
 
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
-import org.example.script.PlayScriptParser.*;
+import org.example.script.antlr.PlayScriptParser;
+import org.example.script.antlr.PlayScriptParser.*;
+import org.example.script.antlr.PlayScriptBaseListener;
 
 import java.util.LinkedList;
 import java.util.List;
