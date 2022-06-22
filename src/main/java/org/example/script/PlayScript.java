@@ -170,36 +170,33 @@ public class PlayScript {
      * 打印帮助信息
      */
     private static void showHelp() {
-        System.out.println("usage: java play.PlayScript [-h | --help | -o outputfile | -S | -bc | -v | -ast-dump] [scriptfile]");
-
-        System.out.println("\t-h or --help : print this help information");
-        System.out.println("\t-v verbose mode : dump AST and symbols");
-        System.out.println("\t-ast-dump : dump AST in lisp style");
-        System.out.println("\t-o outputfile : file pathname used to save generated code, eg. assembly code");
-        System.out.println("\t-S : compile to assembly code");
-        System.out.println("\t-bc : compile to java byte code");
-        System.out.println("\tscriptfile : file contains playscript code");
-
-        System.out.println("\nexamples:");
-        System.out.println("\tjava play.PlayScript");
-        System.out.println("\t>>interactive REPL mode");
-        System.out.println();
-
-        System.out.println("\tjava play.PlayScript -v");
-        System.out.println("\t>>enter REPL with verbose mode, dump ast and symbols");
-        System.out.println();
-
-        System.out.println("\tjava play.PlayScript scratch.play");
-        System.out.println("\t>>compile and execute scratch.play");
-        System.out.println();
-
-        System.out.println("\tjava play.PlayScript -v scratch.play");
-        System.out.println("\t>>compile and execute scratch.play in verbose mode, dump ast and symbols");
-        System.out.println();
-
-        System.out.println("\tjava play.PlayScript -bc scratch.play");
-        System.out.println("\t>>compile to bytecode, save as DefaultPlayClass.class and run it");
-        System.out.println();
+        String output = """
+                usage: java play.PlayScript [-h | --help | -o outputfile | -S | -bc | -v | -ast-dump] [scriptfile]
+                \t-h or --help : print this help information
+                \t-v verbose mode : dump AST and symbols
+                \t-ast-dump : dump AST in lisp style
+                \t-o outputfile : file pathname used to save generated code, eg. assembly code
+                \t-S : compile to assembly code
+                \t-bc : compile to java byte code
+                \tscriptfile : file contains playscript code
+                
+                examples:
+                \tjava play.PlayScript
+                \t>>interactive REPL mode
+                
+                \tjava play.PlayScript -v
+                \t>>enter REPL with verbose mode, dump ast and symbols
+                
+                \tjava play.PlayScript scratch.play
+                \t>>compile and execute scratch.play
+                
+                \tjava play.PlayScript -v scratch.play
+                \t>>compile and execute scratch.play in verbose mode, dump ast and symbols
+                
+                \tjava play.PlayScript -bc scratch.play
+                \t>>compile to bytecode, save as DefaultPlayClass.class and run it
+                """;
+        System.out.println(output);
     }
 
     /**
