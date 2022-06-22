@@ -31,24 +31,24 @@ public class PlayScript {
         //脚本
         String script = null;
 
-        Map params = null;
+        Map<String, Object> params = null;
 
         //解析参数
-        try{
+        try {
             params = parseParams(args);
-        }catch (Exception e){
+        } catch (Exception e) {
             System.out.println(e.getMessage());
             return;
         }
 
         boolean help = params.containsKey("help") ? (Boolean) params.get("help") : false;
-        if (help){
+        if (help) {
             showHelp();
             return;
         }
 
         //从源代码读取脚本
-        String scriptFile = params.containsKey("scriptFile") ? (String)params.get("scriptFile") : null;
+        String scriptFile = params.containsKey("scriptFile") ? (String) params.get("scriptFile") : null;
         if (scriptFile != null) {
             try {
                 script = readTextFile(scriptFile);
@@ -73,12 +73,13 @@ public class PlayScript {
         //进入REPL
         if (script == null) {
             REPL(verbose, ast_dump);
+            return;
         }
 
         //生成汇编代码
         else if (genAsm) {
             //输出文件
-            String outputFile = params.containsKey("outputFile") ? (String)params.get("outputFile") : null;
+            String outputFile = params.containsKey("outputFile") ? (String) params.get("outputFile") : null;
             generateAsm(script, outputFile);
         }
 
@@ -105,37 +106,38 @@ public class PlayScript {
 
     /**
      * 解析参数
+     *
      * @param args
      * @return
      */
-    private static Map parseParams(String args[]) throws Exception {
-        Map<String,Object> params = new HashMap<>();
+    private static Map<String, Object> parseParams(String args[]) throws Exception {
+        Map<String, Object> params = new HashMap<>();
 
         for (int i = 0; i < args.length; i++) {
 
             //输出汇编代码
             if (args[i].equals("-S")) {
-                params.put("genAsm",true);
+                params.put("genAsm", true);
             }
 
             //生成字节码
-            else if (args[i].equals("-bc")){
-                params.put("genByteCode",true);
+            else if (args[i].equals("-bc")) {
+                params.put("genByteCode", true);
             }
 
             //显示作用域和符号
-            else if (args[i].equals("-h") || args[i].equals("--help")){
-                params.put("help",true);
+            else if (args[i].equals("-h") || args[i].equals("--help")) {
+                params.put("help", true);
             }
 
             //显示作用域和符号
-            else if (args[i].equals("-v")){
-                params.put("verbose",true);
+            else if (args[i].equals("-v")) {
+                params.put("verbose", true);
             }
 
             //显示作用域和符号
-            else if (args[i].equals("-ast-dump")){
-                params.put("ast_dump",true);
+            else if (args[i].equals("-ast-dump")) {
+                params.put("ast_dump", true);
             }
 
             //输出文件
@@ -150,7 +152,7 @@ public class PlayScript {
             }
 
             //不认识的参数
-            else if (args[i].startsWith("-")){
+            else if (args[i].startsWith("-")) {
                 throw new Exception("Unknow parameter : " + args[i]);
             }
 
@@ -167,7 +169,7 @@ public class PlayScript {
     /**
      * 打印帮助信息
      */
-    private static void showHelp(){
+    private static void showHelp() {
         System.out.println("usage: java play.PlayScript [-h | --help | -o outputfile | -S | -bc | -v | -ast-dump] [scriptfile]");
 
         System.out.println("\t-h or --help : print this help information");
@@ -226,7 +228,7 @@ public class PlayScript {
     /**
      * 生成字节码，保存到DefaultPlayClass.class
      *
-     * @param script     脚本
+     * @param script 脚本
      */
     private static byte[] generateByteCode(String script) {
         PlayScriptCompiler compiler = new PlayScriptCompiler();
@@ -251,6 +253,7 @@ public class PlayScript {
 
     /**
      * 读文本文件
+     *
      * @param pathName
      * @return
      * @throws IOException
@@ -269,6 +272,7 @@ public class PlayScript {
 
     /**
      * 写文本文件
+     *
      * @param pathName
      * @param text
      * @throws IOException
@@ -306,7 +310,7 @@ public class PlayScript {
         while (true) {
             try {
                 String line = reader.readLine().trim();
-                if (line.equals("exit();")) {
+                if ("exit();".equals(line)) {
                     System.out.println("good bye!");
                     break;
                 }
@@ -347,16 +351,16 @@ public class PlayScript {
 
     /**
      * 运行指定名称的Java类
+     *
      * @param className
      */
-    private static void runJavaClass(String className, byte[] b){
+    private static void runJavaClass(String className, byte[] b) {
         try {
             //java.lang.Class clazz = java.lang.Class.forName(className);
-            java.lang.Class clazz = loadClass(className,b);
+            java.lang.Class clazz = loadClass(className, b);
             Method method = clazz.getMethod("main", String[].class);
-            method.invoke(null, (Object)new String[]{});
-        }
-        catch (Exception e){
+            method.invoke(null, (Object) new String[]{});
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -364,6 +368,7 @@ public class PlayScript {
 
     /**
      * 从byte数组加载类
+     *
      * @param className
      * @param b
      * @return
@@ -377,13 +382,13 @@ public class PlayScript {
             Method method =
                     cls.getDeclaredMethod(
                             "defineClass",
-                            new java.lang.Class[] { String.class, byte[].class, int.class, int.class });
+                            new java.lang.Class[]{String.class, byte[].class, int.class, int.class});
 
             // Protected method invocation.
             method.setAccessible(true);
             try {
                 Object[] args =
-                        new Object[] { className, b, new Integer(0), new Integer(b.length)};
+                        new Object[]{className, b, Integer.valueOf(0), Integer.valueOf(b.length)};
                 clazz = (java.lang.Class) method.invoke(loader, args);
             } finally {
                 method.setAccessible(false);
