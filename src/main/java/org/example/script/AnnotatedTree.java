@@ -78,7 +78,7 @@ public class AnnotatedTree {
      * 是否有编译错误
      * @return
      */
-    protected boolean hasCompilationError(){
+    public boolean hasCompilationError(){
         for (CompilationLog log : logs){
             if (log.type == CompilationLog.ERROR){
                 return true;
