@@ -1,55 +1,168 @@
 package org.example.script;
 
+import org.example.script.enums.ParamFlag;
+
 import java.io.*;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * 命令行工具。可以执行一个脚本，或者以REPL模式运行。
  */
 public class PlayScript {
 
-    public static void main(String args[]) {
-        //String script = "45+10*2;";
-        //String script = "int age = 44; { int i = 10; age+i;}";
-        //String script = "int age = 44; for(int i = 0;i<10;i++) { age = age + 2;} int i = 8;";
-        //String script = "int b= 10; int myfunc(int a) {return a+b+3;} myfunc(2);";
-        //String script = "class myclass{int a=2; int b; myclass(){ b = 3;} }  myclass c = myclass(); c.b;";
-        //String script = "class class1{int a=2; int b; void method1(){println(\"in class1\");}} class class2 extends class1{int b = 5; void method1(){println(\"in class2\");} } class1 c = class2(); println(c.a); println(c.b); c.method1();";
-        //String script = "class myclass{int a; int b; myclass(){a=1; b=2;} int calc(){return a + b;} } myclass c = myclass(); c.calc();";
-        //String script = "println(2);";
-        //String script = "int fun1(int a){return a+1;} println(fun1(2)); function int(int) fun2=fun1; fun2(3);";
-        //String script = "int a=0; function int() fun1(){int b=0; int inner(){a=a+1; b=b+1; return b;} return inner;} function int() fun2 = fun1(); println(fun2()); println(fun2());";
-        //String script = "println(2+3.5); println(\"Hello \" + 45); ";
+    private static String getScript() {
+        Map<Integer, String> result = new HashMap<>();
+
+        String a = """
+                45 + 10 * 2;
+                """;
+        String b = """
+                int age = 44;
+                {
+                    int i = 10;
+                    age + i;
+                }
+                """;
+        String c = """
+                int age = 44;
+                for(int i = 0; i < 10; i++) {
+                    age = age + 2;
+                }
+                int i = 8;
+                """;
+        String d = """
+                int b= 10;
+                int myFunc(int a) {
+                    return a + b + 3;
+                }
+                myFunc(2);
+                """;
+        String e = """
+                class MyClass{
+                    int a = 2;
+                    int b;
+                    MyClass(){
+                        b = 3;
+                    }
+                }
+                MyClass c = MyClass();
+                c.b;
+                """;
+        String f = """
+                class class1{
+                    int a=2;
+                    int b;
+                    void method1() {
+                        println("in class1");
+                    }
+                }
+                                    
+                class class2 extends class1{
+                    int b = 5;
+                    void method1() {
+                        println("in class2");
+                    }
+                }
+                                    
+                class1 c = class2();
+                println(c.a);
+                println(c.b);
+                c.method1();
+                """;
+        String g = """
+                class MyClass{
+                    int a;
+                    int b;
+                    MyClass() {
+                        a = 1;
+                        b = 2;
+                    }
+                    int calc() {
+                        return a + b;
+                    }
+                }
+                MyClass c = MyClass();
+                c.calc();
+                """;
+        String h = """
+                println(2);
+                """;
+        String i = """
+                int fun1(int a) {
+                    return a + 1;
+                }
+                                
+                println(fun1(2));
+                                
+                function int(int)
+                    fun2 = fun1;
+                                
+                fun2(3);
+                """;
+        String j = """
+                int a=0;
+                function int() fun1(){
+                    int b = 0;
+                    int inner() {
+                        a = a + 1;
+                        b = b + 1;
+                        return b;
+                    }
+                    return inner;
+                }
+                                
+                function int() fun2 = fun1();
+                                
+                println(fun2());
+                println(fun2());
+                """;
+        String k = """
+                println(2 + 3.5);
+                println("Hello " + 45);
+                """;
 
         //test asm generation
-        //String script =  null; //"int a = 1; int b =2; int c;  c=a+b;";
-        //String script = "int fun1(int x1, int x2, int x3, int x4, int x5, int x6, int x7, int x8){int c = 10; return x1 + x2 + x3 + x4 + x5 + x6 + x7 + x8 + c;} println(\"fun1: %d\", fun1(1,2,3,4,5,6,7,8));".replaceAll("\\\\", "");
+        String l = """
+                int a = 1;
+                int b = 2;
+                int c;
+                c = a + b;
+                """;
+        String m = """
+                int fun1(int x1, int x2, int x3, int x4, int x5, int x6, int x7, int x8) {
+                    int c = 10;
+                    return x1 + x2 + x3 + x4 + x5 + x6 + x7 + x8 + c;
+                }
+                println("fun1: %d", fun1(1,2,3,4,5,6,7,8));
+                """;
+        return a;
+    }
 
-
+    public static void main(String args[]) {
         //脚本
-        String script = null;
+        String script = getScript();
 
         Map<String, Object> params = null;
 
         //解析参数
         try {
-            params = parseParams(args);
+            parseParams(args);
         } catch (Exception e) {
             System.out.println(e.getMessage());
             return;
         }
 
-        boolean help = params.containsKey("help") ? (Boolean) params.get("help") : false;
-        if (help) {
+        if (ParamFlag.help.isEnable()) {
             showHelp();
             return;
         }
 
         //从源代码读取脚本
-        String scriptFile = params.containsKey("scriptFile") ? (String) params.get("scriptFile") : null;
-        if (scriptFile != null) {
+        if (ParamFlag.scriptFile.isEnable()) {
+            String scriptFile = ParamFlag.scriptFile.getAddition();
             try {
                 script = readTextFile(scriptFile);
             } catch (IOException e) {
@@ -58,33 +171,25 @@ public class PlayScript {
             }
         }
 
-        //是否生成汇编代码
-        boolean genAsm = params.containsKey("genAsm") ? (Boolean) params.get("genAsm") : false;
-
-        //是否生成字节码
-        boolean genByteCode = params.containsKey("genByteCode") ? (Boolean) params.get("genByteCode") : false;
-
-        //打印编译过程中的信息
-        boolean verbose = params.containsKey("verbose") ? (Boolean) params.get("verbose") : false;
-
-        //打印AST
-        boolean ast_dump = params.containsKey("ast_dump") ? (Boolean) params.get("ast_dump") : false;
-
         //进入REPL
         if (script == null) {
-            REPL(verbose, ast_dump);
+            REPL(ParamFlag.verbose.isEnable(), ParamFlag.ast_dump.isEnable());
             return;
         }
 
         //生成汇编代码
-        else if (genAsm) {
+        else if (ParamFlag.genAsm.isEnable()) {
             //输出文件
-            String outputFile = params.containsKey("outputFile") ? (String) params.get("outputFile") : null;
-            generateAsm(script, outputFile);
+            if (ParamFlag.outputFile.isEnable()) {
+                String outputFile = ParamFlag.outputFile.getAddition();
+                generateAsm(script, outputFile);
+            } else {
+                generateAsm(script, null);
+            }
         }
 
         //生成Java字节码
-        else if (genByteCode) {
+        else if (ParamFlag.genByteCode.isEnable()) {
             //输出文件
             //String outputFile = params.containsKey("outputFile") ? (String)params.get("outputFile") : null;
             byte[] bc = generateByteCode(script);
@@ -94,7 +199,7 @@ public class PlayScript {
         //执行脚本
         else {
             PlayScriptCompiler compiler = new PlayScriptCompiler();
-            AnnotatedTree at = compiler.compile(script, verbose, ast_dump);
+            AnnotatedTree at = compiler.compile(script, ParamFlag.verbose.isEnable(), ParamFlag.ast_dump.isEnable());
 
             if (!at.hasCompilationError()) {
                 Object result = compiler.Execute(at);
@@ -110,60 +215,27 @@ public class PlayScript {
      * @param args
      * @return
      */
-    private static Map<String, Object> parseParams(String args[]) throws Exception {
-        Map<String, Object> params = new HashMap<>();
-
+    private static void parseParams(String args[]) throws Exception {
+        Optional<ParamFlag> additon = Optional.empty();
         for (int i = 0; i < args.length; i++) {
-
-            //输出汇编代码
-            if (args[i].equals("-S")) {
-                params.put("genAsm", true);
+            if (additon.isPresent()) {
+                additon.get().setAddition(args[i]);
+                additon = Optional.empty();
+                break;
             }
-
-            //生成字节码
-            else if (args[i].equals("-bc")) {
-                params.put("genByteCode", true);
-            }
-
-            //显示作用域和符号
-            else if (args[i].equals("-h") || args[i].equals("--help")) {
-                params.put("help", true);
-            }
-
-            //显示作用域和符号
-            else if (args[i].equals("-v")) {
-                params.put("verbose", true);
-            }
-
-            //显示作用域和符号
-            else if (args[i].equals("-ast-dump")) {
-                params.put("ast_dump", true);
-            }
-
-            //输出文件
-            else if (args[i].equals("-o")) {
-                if (i + 1 < args.length) {
-                    //outputFile = args[++i];  //让i的序号增加一个
-                    params.put("outputFile", args[++i]);
-                } else {
-                    //System.out.println("Expecting a filename after -o");
-                    throw new Exception("Expecting a filename after -o");
+            for (ParamFlag value : ParamFlag.values()) {
+                if (value.enableIfMatch(args[i])) {
+                    if (value.haveAddition()) {
+                        additon = Optional.of(value);
+                    }
+                    break;
                 }
-            }
-
-            //不认识的参数
-            else if (args[i].startsWith("-")) {
                 throw new Exception("Unknow parameter : " + args[i]);
             }
-
-            //脚本文件
-            else {
-                params.put("scriptFile", args[i]);
-                //scriptFile = args[i];
-            }
         }
-
-        return params;
+        if (additon.isPresent()) {
+            throw new Exception("Expecting a filename after " + additon.get().getFlag());
+        }
     }
 
     /**
@@ -179,20 +251,20 @@ public class PlayScript {
                 \t-S : compile to assembly code
                 \t-bc : compile to java byte code
                 \tscriptfile : file contains playscript code
-                
+                                
                 examples:
                 \tjava play.PlayScript
                 \t>>interactive REPL mode
-                
+                                
                 \tjava play.PlayScript -v
                 \t>>enter REPL with verbose mode, dump ast and symbols
-                
+                                
                 \tjava play.PlayScript scratch.play
                 \t>>compile and execute scratch.play
-                
+                                
                 \tjava play.PlayScript -v scratch.play
                 \t>>compile and execute scratch.play in verbose mode, dump ast and symbols
-                
+                                
                 \tjava play.PlayScript -bc scratch.play
                 \t>>compile to bytecode, save as DefaultPlayClass.class and run it
                 """;
